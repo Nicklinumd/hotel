@@ -54,7 +54,6 @@
         <div id="card-number-warning" class="warning"></div>
         <div id="date-warning" class="warning"></div>
         <div id="people-number-warning" class="warning"></div>
-<!--        <div id="smoke-warning" class="warning"></div>-->
         <label for="first-name">First Name: </label>
         <input type="text" id="first-name" name="first-name" required><br>
 
@@ -75,8 +74,6 @@
         <input type="date" id="end-date" name="end-date" value="2021-12-13"
                onchange="validateDate()"><br>
 
-
-
         <p>Do you plan to smoke in the room?</p>
         <input type="radio" id="smoke-yes" name="smoke" value="yes">
         <label for="smoke-yes">Yes</label><br>
@@ -84,15 +81,15 @@
         <label for="smoke-no">No</label><br>
 
         <label for="room-type">Room Type: </label>
-        <select name="room-type" id="room-type">
-            <option value="suite">Suite</option>
-            <option value="normal">Normal Room</option>
+        <select name="room-type" id="room-type" onchange="updateFloorOptions()">
+            <option value="1">Suite</option>
+            <option value="2">Normal Room</option>
         </select><br>
 
         <label for="bed-type">Bed Type: </label>
-        <select name="bed-type" id="bed-type">
-            <option value="1">Single King-sized Bed</option>
-            <option value="2">Double Queen-size Bed</option>
+        <select name="bed-type" id="bed-type" onchange="updateFloorOptions()">
+            <option value="1">King-sized Bed</option>
+            <option value="2">Queen-size Bed</option>
         </select><br>
 
         <label for="floor">Floor: </label>
