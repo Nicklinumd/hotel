@@ -48,65 +48,67 @@
     <script src="reserve.js"></script>
 </head>
 
-<body>
-    <form id="reservation-form" action="">
-        <h1>Information</h1>
-        <div id="card-number-warning" class="warning"></div>
-        <div id="date-warning" class="warning"></div>
-        <div id="people-number-warning" class="warning"></div>
-        <label for="first-name">First Name: </label>
-        <input type="text" id="first-name" name="first-name" required><br>
+<body onload="setupForm()">
+    <form id="reservation-form" action="confirmation.html" onsubmit="return validateForm();">
+        <h1>Reservation Information</h1>
+        <label for="firstName">First Name: </label>
+        <input type="text" id="firstName" name="firstName"><br>
+        <p id="firstNameError" class="errorMessage"></p>
 
-        <label for="middle-name">Middle Name: </label>
-        <input type="text" id="middle-name" name="middle-name" required><br>
+        <label for="middleName">Middle Name: </label>
+        <input type="text" id="middleName" name="middleName"><br>
+        <p id="middleNameError" class="errorMessage"></p>
 
-        <label for="last-name">Last Name: </label>
-        <input type="text" id="last-name" name="last-name" required><br>
+        <label for="lastName">Last Name: </label>
+        <input type="text" id="lastName" name="lastName"><br>
+        <p id="lastNameError" class="errorMessage"></p>
 
-        <label for="card-number">Royalty Card Number: </label>
-        <input type="text" id="card-number" name="card-number" onchange="validateCardNumber()"><br>
+        <label for="cardNumber">Royalty Card Number: </label>
+        <input type="text" id="cardNumber" name="cardNumber"><br>
+        <p id="cardNumberError" class="errorMessage"></p>
 
-        <label for="start-date">Start Date: </label>
-        <input type="date" id="start-date" name="start-date" value="2021-12-12"
-               onchange="validateDate()"><br>
+        <label for="startDate">Start Date: </label>
+        <input type="date" id="startDate" name="startDate" value="2021-12-12"><br>
 
-        <label for="end-date">End Date: </label>
-        <input type="date" id="end-date" name="end-date" value="2021-12-13"
-               onchange="validateDate()"><br>
+        <label for="endDate">End Date: </label>
+        <input type="date" id="endDate" name="endDate" value="2021-12-13"><br>
+        <p id="dateError" class="errorMessage"></p>
 
         <p>Do you plan to smoke in the room?</p>
-        <input type="radio" id="smoke-yes" name="smoke" value="yes">
-        <label for="smoke-yes">Yes</label><br>
-        <input type="radio" id="smoke-no" name="smoke" value="no">
-        <label for="smoke-no">No</label><br>
+        <input type="radio" id="smokeYes" name="smoke" value="yes">
+        <label for="smokeYes">Yes</label><br>
+        <input type="radio" id="smokeNo" name="smoke" value="no" checked>
+        <label for="smokeNo">No</label><br>
 
-        <label for="room-type">Room Type: </label>
-        <select name="room-type" id="room-type" onchange="updateFloorOptions()">
+        <label for="roomType">Room Type: </label>
+        <select name="roomType" id="roomType">
             <option value="1">Suite</option>
             <option value="2">Normal Room</option>
         </select><br>
 
-        <label for="bed-type">Bed Type: </label>
-        <select name="bed-type" id="bed-type" onchange="updateFloorOptions()">
+        <label for="bedType">Bed Type: </label>
+        <select name="bedType" id="bedType">
             <option value="1">King-sized Bed</option>
             <option value="2">Queen-size Bed</option>
         </select><br>
 
         <label for="floor">Floor: </label>
         <select name="floor" id="floor">
-            <option value="2">Second Floor</option>
-            <option value="3">Third Floor</option>
             <option value="4">Fourth Floor</option>
             <option value="5">Fifth Floor</option>
         </select><br>
+        <p id="floorError" class="errorMessage"></p>
 
-        <label for="people-number">Number of People: </label>
-        <input type="number" id="people-number" name="people-number" min="1" required><br>
+        <label for="peopleNumber">Number of People: </label>
+        <input type="number" id="peopleNumber" name="peopleNumber" min="1"><br>
+        <p id="peopleNumberError" class="errorMessage"></p>
 
         <label for="street">Street: </label>
-        <input type="street" id="street" placeholder="Street" required><br>
+        <input type="street" id="street" placeholder="Street"><br>
+        <p id="streetError" class="errorMessage"></p>
         <label for="city">City: </label>
-        <input type="city"  id="city" placeholder="city" required><br>
+        <input type="city"  id="city" placeholder="city"><br>
+        <p id="cityError" class="errorMessage"></p>
         <label for="state">State: </label>
         <select id="state">
             <option value="AL">Alabama</option>
@@ -162,12 +164,15 @@
             <option value="WY">Wyoming</option>
         </select><br>
         <label for="zip">Zip: </label>
-        <input type="zip"  id="zip" placeholder="zip" required><br>
-        <label for="county">County: </label>
-        <input type="county"  id="county" placeholder="county" required><br>
-        <label for="country">Country: </label>
-        <input type="country"  id="country" placeholder="country" required><br>
-        <input type="submit" value="Submit">
+        <input type="zip"  id="zip" placeholder="zip"><br>
+        <p id="zipError" class="errorMessage"></p>
+        <p>Would you like breakfast? It is free for loyalty member</p>
+        <input type="radio" id="breakfastYes" name="breakfast" value="yes">
+        <label for="breakfastYes">Yes</label><br>
+        <input type="radio" id="breakfastNo" name="breakfast" value="no" checked>
+        <label for="breakfastNo">No</label><br>
+        <input id="roomNumber" type="text" name="roomNumber" hidden>
+        <input id="submit" type="submit" value="Submit">
     </form>
 </body>
 </html>
