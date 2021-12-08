@@ -1,31 +1,36 @@
-class Hotel { // Hotel class
-	constructor() {
+// Hotel class which represents the hotel system
+class Hotel { 
+	// Initialize the hotel with specified room types and bed types
+	constructor(data) {
 		this.floorList = [];
 		for (let i = 2; i < 6; i++) { // 4 floors
 			const floor = new Floor(i);
 			for (let j = 1; j < 5; j++) { // 4 normal rooms per floor
-				let bedType = 1;
-				if (j > 2) {
+				let bedType = 1; // 1: King-sized Bed, 2: Queen-size Bed
+				if (j > 2) { // 2 rooms with bed type 1 and 2 rooms with bed type 2
 					bedType = 2;
 				}
 				const room = new Room(i + '0' + j, 2, bedType, i);
-				floor.addRoom(room);
+				floor.addRoom(room); // Add each room to each floor
 			}
 			let bedType = 1;
-			if (i < 4) {
+			if (i < 4) { // 2 suites with bed type 1 and 2 rooms with bed type 2
 				bedType = 2;
 			}
 			const suite = new Room(i + '05', 1, bedType, i); // 1 suite per floor
 			floor.addRoom(suite);
 			this.addFloor(floor);
 		}
+		this.loadReservations(data) // Load reservation data
 	}
 
-	addFloor(floor) {
+	// Add floor to hotel class
+	addFloor(floor) { 
 		this.floorList.push(floor);
 	}
 
-	getFloor(floor) {
+	// Return floor with floor number
+	getFloor(floor) { 
 		for (let i = 0; i < this.floorList.length; i++) {
 			if (this.floorList[i].floorNumber == floor) {
 				return this.floorList[i];
@@ -34,7 +39,9 @@ class Hotel { // Hotel class
 		return null;
 	}
 
-	hasRoom(roomType, bedType, startDate, endDate) {
+	// Check if hotel has available room with selected requirements
+	// Return list of floors with avaible room
+	hasRoom(roomType, bedType, startDate, endDate) { 
 		let availableFloor = [];
 		for (let i = 0; i < this.floorList.length; i++) {
 			let floor = this.floorList[i];
@@ -44,18 +51,47 @@ class Hotel { // Hotel class
 		}
 		return availableFloor
 	}
+
+	// Load reservation from js file
+	loadReservations(data) {
+		for (let i = 0; i < data.length; i++) {
+			let resData = data[i];
+			let floor = this.getFloor(resData['room'].charAt(0));
+			let room = floor.getRoom(resData['room']);
+			let startDate = new Date(resData['checkIn']);
+			let endDate = new Date(resData['checkOut']);
+			// Determine if the room in the reservation is a valid room.  If not, ignore the data.
+			if (room != null) {
+				room.reservation.push({'startDate': startDate, 'endDate': endDate})
+			}
+		}
+	}
 }
 
+// Floor class which represents each floor
 class Floor {
+	// Initialize a floor with specified floor number and an empty room list
 	constructor(floorNumber) {
 		this.floorNumber = floorNumber;
 		this.roomList = [];
 	}
 
+	// Add a room object to the room list
 	addRoom(room) {
 		this.roomList.push(room);
 	}
 
+	// Get room with room number
+	getRoom(roomNumber) {
+		for (let i = 0; i < this.roomList.length; i++) {
+			if (this.roomList[i].roomNumber == roomNumber) {
+				return this.roomList[i];
+			}
+		}
+		return null;
+	}
+
+	// Return the first available room for reservation
 	firstRoomAvailable(roomType, bedType, startDate, endDate) {
 		for (let i = 0; i < this.roomList.length; i++) {
 			if (this.roomList[i].checkReservation(roomType, bedType, startDate, endDate)) {
@@ -65,6 +101,7 @@ class Floor {
 		return null;
 	}
 
+	// Check if the floor has available rooms with specified requirements
 	hasRoom(roomType, bedType, startDate, endDate) {
 		let match = false;
 		this.roomList.forEach(function(element) {
@@ -76,7 +113,9 @@ class Floor {
 	}
 }
 
+// Room class which represents each room
 class Room {
+	// Initialize a room with room number, room type, bed type, floor, and an empty reservation list
 	constructor(roomNumber, roomType, bedType, floor) {
 		this.roomNumber = roomNumber;
 		this.roomType = roomType; // 1: suite 2. normal room
@@ -85,11 +124,20 @@ class Room {
 		this.reservation = [];
 	}
 
+	// Check if room can be reserved with specified requirements
 	checkReservation(roomType, bedType, startDate, endDate) {
 		let available = true;
+		startDate = new Date(startDate);
+		endDate = new Date(endDate);
 		if (roomType == this.roomType && bedType == this.bedType) {
+			// There are three conditions which room is unavailable
+			// 1. Input start date is within a reservation range
+			// 2. Input end date is within a reservation range
+			// 3. A reservation range is within the input range
 			this.reservation.forEach(function(element){
-				if ((element.startDate > startDate && element.startDate < endDate) || (element.endDate > startDate && element.endDate < endDate)) {
+				if ((startDate > element.startDate && startDate < element.endDate) || 
+					(endDate > element.startDate && endDate < element.endDate) ||
+					(startDate < element.startDate && endDate > element.endDate)) {
 					available = false;
 				}
 			});
@@ -99,6 +147,7 @@ class Room {
 		return available
 	}
 
+	// Reserve the room by adding input date range into the reservation list
 	reserve(startDate, endDate) {
 		if (this.checkReservation(startDate, endDate)) {
 			this.reservation.push({'startDate': startDate, 'endDate': endDate});
@@ -109,36 +158,41 @@ class Room {
 
 let hotel;
 
+// Check if character is letter
 function checkLetter(c) {
 	return c >= 'A' && c <= 'z';
 }
 
+// Check if character is number
 function checkNumber(c) {
 	return c >= '1' && c <= '9';
 }
 
+// Check if input is empty
 function notEmpty(input) {
 	return input !== "" ;
 }
 
+// Check if input contains space
 function noSpace(input) {
 	return input !== " " && input.indexOf(" ") === -1
 }
 
+// Helper method for checking card number
 function checkCardNumberHelper(cardNumber) {
 	if (cardNumber.length > 0 && cardNumber.length <= 6) {
 		for (let i = 0; i < cardNumber.length; i++) {
-			if (i < 2) {
+			if (i < 2) { // First two characters must be letters
 				if (!checkLetter(cardNumber.charAt(i))) {
 					return false;
 				}
-			} else {
+			} else { // Last four characters must be numbers
 				if (!checkNumber(cardNumber.charAt(i))) {
 					return false;
 				}
 			}
 		}
-	} else if (cardNumber.length < 1) {
+	} else if (cardNumber.length == 0) { // User did not input anything which is fine
 		return true;
 	} else {
 		return false;
@@ -146,50 +200,57 @@ function checkCardNumberHelper(cardNumber) {
 	return true;
 }
 
+// Helper method for checking dates
+// Input start date needs to be prior than today and end date needs to be prior than start date
 function checkDateHelper(startDate, endDate) {
 	let today = new Date();
 	let inputStartDate = new Date(startDate);
 	let inputEndDate = new Date(endDate);
 	return inputStartDate.valueOf() + inputStartDate.getTimezoneOffset() * 100000 > today.valueOf() &&
-		inputEndDate > inputStartDate;
+		inputEndDate > inputStartDate; 
 }
 
+// Helper method for checking floor
 function checkFloorHelper(smokeYes, smokeNo, floor, roomType, bedType, startDate, endDate) {
+	// Get available floor list
 	let floorList = hotel.hasRoom(roomType.value, bedType.value, startDate.value, endDate.value);
+	// Remove all the options for floor
 	while (floor.firstChild) {
 		floor.removeChild(floor.firstChild);
 	}
-	if (floorList.length === 0) {
+
+	// Add each available floor to the options
+	for (let j = 0; j < floorList.length; j++){
+		// If smoke is chosen, only floor 5 is available
+		if ((smokeYes.checked && floorList[j].floorNumber === 5) || smokeNo.checked) {
+			let opt = document.createElement('option');
+			opt.value = floorList[j].floorNumber;
+			opt.innerHTML = 'Floor ' + floorList[j].floorNumber;
+			floor.appendChild(opt);
+		}
+	}
+	if (floor.length === 0) { // No available rooms on any floor
 		return false;
-	} else {
-		for (let j = 0; j < floorList.length; j++){
-			if ((smokeYes.checked && floorList[j].floorNumber === 5) || smokeNo.checked) {
-				let opt = document.createElement('option');
-				opt.value = floorList[j].floorNumber;
-				opt.innerHTML = 'Floor ' + floorList[j].floorNumber;
-				floor.appendChild(opt);
-			}
-		}
-		if (floor.length == 0) {
-			return false;
-		} else{
-			return true;
-		}
+	} else{
+		return true;
 	}
 }
 
+// Helper method for checking number of people
 function checkPeopleNumberHelper(peopleNumber, roomType) {
-	if (peopleNumber.value < 1) {
+	if (peopleNumber.value < 1) { // Number of people can not be less than 1
 		return 1;
-	} else if (roomType.value == 1 && peopleNumber.value > 4) {
+	} else if (roomType.value == 1 && peopleNumber.value > 4) { // Maximum for a suite is 4
 		return 2;
-	} else if (roomType.value == 2 && peopleNumber.value > 2) {
+	} else if (roomType.value == 2 && peopleNumber.value > 2) { // Maximum for a normal room is 2
 		return 3;
-	} else {
+	} else { // Pass
 		return 0;
 	}
 }
 
+// Helper method for checking zip code
+// Zip code needs to be exactly 5 numbers
 function checkZipHelper(zip) {
 	let numbers = /^[0-9]+$/;
 	return (zip.value.length === 5 && zip.value.match(numbers));
@@ -211,7 +272,9 @@ const INVALIDATE_PEOPLE_NUMBER_1 = "Number of People can not be less than 1.";
 const INVALIDATE_PEOPLE_NUMBER_2 = "Maximum number of people for a suite is 4.";
 const INVALIDATE_PEOPLE_NUMBER_3 = "Maximum number of people for a normal room is 2.";
 
-function setupForm() {
+function setupForm(data) {
+	hotel = new Hotel(data);
+	// console.log(hotel);
 	let firstName = document.getElementById("firstName");
 	let middleName = document.getElementById("middleName");
 	let lastName = document.getElementById("lastName");
@@ -229,7 +292,7 @@ function setupForm() {
 	let zip = document.getElementById("zip");
 
 	let firstNameError = document.getElementById("firstNameError");
-	let middleNameError = document.getElementById("middleError");
+	let middleNameError = document.getElementById("middleNameError");
 	let lastNameError = document.getElementById("lastNameError");
 	let cardNumberError = document.getElementById("cardNumberError");
 	let dateError = document.getElementById("dateError");
@@ -240,14 +303,15 @@ function setupForm() {
 	let zipError = document.getElementById("zipError");
 
 	let submit = document.getElementById("submit");
-	hotel = new Hotel();
 
 	firstName.addEventListener("change", checkFirstName);
 	middleName.addEventListener("change", checkMiddleName);
 	lastName.addEventListener("change", checkLastName);
 	cardNumber.addEventListener("change", checkCardNumber);
 	startDate.addEventListener("change", checkDate);
+	startDate.addEventListener("change", checkFloor);
 	endDate.addEventListener("change", checkDate);
+	endDate.addEventListener("change", checkFloor);
 	smokeYes.addEventListener("click", checkFloor);
 	smokeNo.addEventListener("click", checkFloor);
 	roomType.addEventListener("change", checkFloor);
